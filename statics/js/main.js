@@ -1,10 +1,248 @@
-(function($){"use strict";function portfolio_init(){var portfolio_grid=$('.portfolio-grid'),portfolio_filter=$('.portfolio-filters');if(portfolio_grid){portfolio_grid.shuffle({speed:450,itemSelector:'figure'});portfolio_filter.on("click",".filter",function(e){portfolio_grid.shuffle('update');e.preventDefault();$('.portfolio-filters .filter').parent().removeClass('active');$(this).parent().addClass('active');portfolio_grid.shuffle('shuffle',$(this).attr('data-group'));});}}
-function mobileMenuHide(){var windowWidth=$(window).width(),siteHeader=$('#site_header');if(windowWidth<1025){siteHeader.addClass('mobile-menu-hide');$('.menu-toggle').removeClass('open');setTimeout(function(){siteHeader.addClass('animate');},500);}else{siteHeader.removeClass('animate');}}
-function customScroll(){var windowWidth=$(window).width();if(windowWidth>1024){$('.animated-section, .single-page-content').each(function(){$(this).perfectScrollbar();});}else{$('.animated-section, .single-page-content').each(function(){$(this).perfectScrollbar('destroy');});}}
-$(function(){$('#contact_form').validator();$('#contact_form').on('submit',function(e){if(!e.isDefaultPrevented()){var url="contact_form/contact_form.php";$.ajax({type:"POST",url:url,data:$(this).serialize(),success:function(data)
-{var messageAlert='alert-'+data.type;var messageText=data.message;var alertBox='<div class="alert '+messageAlert+' alert-dismissable"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>'+messageText+'</div>';if(messageAlert&&messageText){$('#contact_form').find('.messages').html(alertBox);$('#contact_form')[0].reset();}}});return false;}});});$(window).on('load',function(){$(".preloader").fadeOut(800,"linear");var ptPage=$('.animated-sections');if(ptPage[0]){PageTransitions.init({menu:'ul.main-menu',});}}).on('resize',function(){mobileMenuHide();$('.animated-section').each(function(){$(this).perfectScrollbar('update');});customScroll();});$(document).on('ready',function(){var movementStrength=23;var height=movementStrength/$(document).height();var width=movementStrength/$(document).width();$("body").on('mousemove',function(e){var pageX=e.pageX-($(document).width()/2),pageY=e.pageY-($(document).height()/2),newvalueX=width*pageX*-1,newvalueY=height*pageY*-1,elements=$('.lm-animated-bg');elements.addClass('transition');elements.css({"background-position":"calc( 50% + "+newvalueX+"px ) calc( 50% + "+newvalueY+"px )",});setTimeout(function(){elements.removeClass('transition');},300);})
-$('.menu-toggle').on("click",function(){$('#site_header').addClass('animate');$('#site_header').toggleClass('mobile-menu-hide');$('.menu-toggle').toggleClass('open');});$('.main-menu').on("click","a",function(e){mobileMenuHide();});$('.sidebar-toggle').on("click",function(){$('#blog-sidebar').toggleClass('open');});var $portfolio_container=$(".portfolio-grid");$portfolio_container.imagesLoaded(function(){portfolio_init(this);});var $container=$(".blog-masonry");$container.imagesLoaded(function(){$container.masonry();});customScroll();$('.text-rotation').owlCarousel({loop:true,dots:false,nav:false,margin:0,items:1,autoplay:true,autoplayHoverPause:false,autoplayTimeout:3800,animateOut:'animated-section-scaleDown',animateIn:'animated-section-scaleUp'});$(".testimonials.owl-carousel").imagesLoaded(function(){$(".testimonials.owl-carousel").owlCarousel({nav:true,items:3,loop:false,navText:false,autoHeight:true,margin:25,responsive:{0:{items:1,},480:{items:1,},768:{items:2,},1200:{items:2,}}});});$(".clients.owl-carousel").imagesLoaded().owlCarousel({nav:true,items:2,loop:false,navText:false,margin:10,autoHeight:true,responsive:{0:{items:2,},768:{items:4,},1200:{items:5,}}});$('.form-control').val('').on("focusin",function(){$(this).parent('.form-group').addClass('form-group-focus');}).on("focusout",function(){if($(this).val().length===0){$(this).parent('.form-group').removeClass('form-group-focus');}});$('body').magnificPopup({delegate:'a.lightbox',type:'image',removalDelay:300,mainClass:'mfp-fade',image:{titleSrc:'title',gallery:{enabled:true},},iframe:{markup:'<div class="mfp-iframe-scaler">'+
-'<div class="mfp-close"></div>'+
-'<iframe class="mfp-iframe" frameborder="0" allowfullscreen></iframe>'+
-'<div class="mfp-title mfp-bottom-iframe-title"></div>'+
-'</div>',patterns:{youtube:{index:'youtube.com/',id:null,src:'%id%?autoplay=1'},vimeo:{index:'vimeo.com/',id:'/',src:'//player.vimeo.com/video/%id%?autoplay=1'},gmaps:{index:'//maps.google.',src:'%id%&output=embed'}},srcAction:'iframe_src',},callbacks:{markupParse:function(template,values,item){values.title=item.el.attr('title');}},});});})(jQuery);
+/**
+ * Template Name: DevFolio
+ * Template URL: https://bootstrapmade.com/devfolio-bootstrap-portfolio-html-template/
+ * Updated: Mar 17 2024 with Bootstrap v5.3.3
+ * Author: BootstrapMade.com
+ * License: https://bootstrapmade.com/license/
+ */
+
+(function () {
+  "use strict";
+
+  /**
+   * Easy selector helper function
+   */
+  const select = (el, all = false) => {
+    el = el.trim();
+    if (all) {
+      return [...document.querySelectorAll(el)];
+    } else {
+      return document.querySelector(el);
+    }
+  };
+
+  /**
+   * Easy event listener function
+   */
+  const on = (type, el, listener, all = false) => {
+    let selectEl = select(el, all);
+    if (selectEl) {
+      if (all) {
+        selectEl.forEach((e) => e.addEventListener(type, listener));
+      } else {
+        selectEl.addEventListener(type, listener);
+      }
+    }
+  };
+
+  /**
+   * Easy on scroll event listener
+   */
+  const onscroll = (el, listener) => {
+    el.addEventListener("scroll", listener);
+  };
+
+  /**
+   * Navbar links active state on scroll
+   */
+  let navbarlinks = select("#navbar .scrollto", true);
+  const navbarlinksActive = () => {
+    let position = window.scrollY + 200;
+    navbarlinks.forEach((navbarlink) => {
+      if (!navbarlink.hash) return;
+      let section = select(navbarlink.hash);
+      if (!section) return;
+      if (
+        position >= section.offsetTop &&
+        position <= section.offsetTop + section.offsetHeight
+      ) {
+        navbarlink.classList.add("active");
+      } else {
+        navbarlink.classList.remove("active");
+      }
+    });
+  };
+  window.addEventListener("load", navbarlinksActive);
+  onscroll(document, navbarlinksActive);
+
+  /**
+   * Scrolls to an element with header offset
+   */
+  const scrollto = (el) => {
+    let header = select("#header");
+    let offset = header.offsetHeight;
+
+    if (!header.classList.contains("header-scrolled")) {
+      offset -= 16;
+    }
+
+    let elementPos = select(el).offsetTop;
+    window.scrollTo({
+      top: elementPos - offset,
+      behavior: "smooth",
+    });
+  };
+
+  /**
+   * Toggle .header-scrolled class to #header when page is scrolled
+   */
+  let selectHeader = select("#header");
+  if (selectHeader) {
+    const headerScrolled = () => {
+      if (window.scrollY > 100) {
+        selectHeader.classList.add("header-scrolled");
+      } else {
+        selectHeader.classList.remove("header-scrolled");
+      }
+    };
+    window.addEventListener("load", headerScrolled);
+    onscroll(document, headerScrolled);
+  }
+
+  /**
+   * Back to top button
+   */
+  let backtotop = select(".back-to-top");
+  if (backtotop) {
+    const toggleBacktotop = () => {
+      if (window.scrollY > 100) {
+        backtotop.classList.add("active");
+      } else {
+        backtotop.classList.remove("active");
+      }
+    };
+    window.addEventListener("load", toggleBacktotop);
+    onscroll(document, toggleBacktotop);
+  }
+
+  /**
+   * Mobile nav toggle
+   */
+  on("click", ".mobile-nav-toggle", function (e) {
+    select("#navbar").classList.toggle("navbar-mobile");
+    this.classList.toggle("bi-list");
+    this.classList.toggle("bi-x");
+  });
+
+  /**
+   * Mobile nav dropdowns activate
+   */
+  on(
+    "click",
+    ".navbar .dropdown > a",
+    function (e) {
+      if (select("#navbar").classList.contains("navbar-mobile")) {
+        e.preventDefault();
+        this.nextElementSibling.classList.toggle("dropdown-active");
+      }
+    },
+    true
+  );
+
+  /**
+   * Scrool with ofset on links with a class name .scrollto
+   */
+  on(
+    "click",
+    ".scrollto",
+    function (e) {
+      if (select(this.hash)) {
+        e.preventDefault();
+
+        let navbar = select("#navbar");
+        if (navbar.classList.contains("navbar-mobile")) {
+          navbar.classList.remove("navbar-mobile");
+          let navbarToggle = select(".mobile-nav-toggle");
+          navbarToggle.classList.toggle("bi-list");
+          navbarToggle.classList.toggle("bi-x");
+        }
+        scrollto(this.hash);
+      }
+    },
+    true
+  );
+
+  /**
+   * Scroll with ofset on page load with hash links in the url
+   */
+  window.addEventListener("load", () => {
+    if (window.location.hash) {
+      if (select(window.location.hash)) {
+        scrollto(window.location.hash);
+      }
+    }
+  });
+
+  /**
+   * Intro type effect
+   */
+  const typed = document.querySelector(".typed");
+  if (typed) {
+    let typed_strings = typed.getAttribute("data-typed-items");
+    typed_strings = typed_strings.split(",");
+    new Typed(typed, {
+      strings: typed_strings,
+      loop: true,
+      typeSpeed: 100,
+      backSpeed: 50,
+      backDelay: 2000,
+    });
+  }
+
+  /**
+   * Initiate portfolio lightbox
+   */
+  const portfolioLightbox = GLightbox({
+    selector: ".portfolio-lightbox",
+  });
+
+  /**
+   * Testimonials slider
+   */
+  new Swiper(".testimonials-slider", {
+    speed: 600,
+    loop: true,
+    autoplay: {
+      delay: 5000,
+      disableOnInteraction: false,
+    },
+    slidesPerView: "auto",
+    pagination: {
+      el: ".swiper-pagination",
+      type: "bullets",
+      clickable: true,
+    },
+  });
+
+  /**
+   * Portfolio details slider
+   */
+  new Swiper(".portfolio-details-slider", {
+    speed: 400,
+    loop: true,
+    autoplay: {
+      delay: 5000,
+      disableOnInteraction: false,
+    },
+    pagination: {
+      el: ".swiper-pagination",
+      type: "bullets",
+      clickable: true,
+    },
+  });
+
+  /**
+   * Preloader
+   */
+  let preloader = select("#preloader");
+  if (preloader) {
+    window.addEventListener("load", () => {
+      preloader.remove();
+    });
+  }
+
+  /**
+   * Initiate Pure Counter
+   */
+  new PureCounter();
+})();
