@@ -6,5 +6,4 @@ app_name = "resume"
 
 urlpatterns = [
     path("", resume_view, name="resume-view"),
-    path("portfolio/", portfolio_view, name="portfolio"),
 ]
